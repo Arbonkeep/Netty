@@ -14,7 +14,7 @@
  * @Date 2021/4/24 18:55
  * @Description
  */
-public class TestServer {
+public class TestServer  {
     public static void main(String[] args) {
         //创建事件循环组
         EventLoopGroup bossGroup = new NioEventLoopGroup();//接收连接，交给workerGroup4处理
