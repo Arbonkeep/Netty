@@ -5,7 +5,7 @@
 
 ### 简单的HelloWorld程序
 
-1. 创建一个测试的TestServer
+1. 创建一个测试的TestServer，HTTP的功能DEMO
 
 ```java
 
@@ -240,5 +240,193 @@ public class TestHttpServerHandler extends SimpleChannelInboundHandler<HttpObjec
 
 ```
 
+## Netty的Socket编程详解
+
+1.  Netty主要的三个作用
+
+```
+    <1> Socket开发，自定义协议（定义数据的格式）
+
+    <2> HTTP长连接开发
+
+    <3> 类似于springmvc的链接式开发
+
+```
+
+2. Netty实现Socket编程DEMO
+
+- 服务端代码实现
+
+``` java
+
+/**
+ * @Author LBX
+ * @Date 2021/5/10 19:40
+ * @Description
+ */
+public class TestServer {
+    public static void main(String[] args) throws Exception {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .childHandler(new TestServerInnitializer());
+            //bind port
+            ChannelFuture channelFuture = serverBootstrap.bind(1001).sync();
+            channelFuture.channel().closeFuture().sync();
+        }finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
+
+    }
+
+
+}
+
+```
+
+``` java
+
+/**
+ * @Author LBX
+ * @Date 2021/5/10 20:06
+ * @Description  指定泛型为String，传递的数据类型为String
+ */
+public class TestServerHandler extends SimpleChannelInboundHandler<String> {
+
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        System.out.println(ctx.channel().remoteAddress() + ", " + msg);
+        ctx.channel().writeAndFlush("服务器发送的消息:" + UUID.randomUUID().toString());
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+}
+
+```
+
+``` java
+
+/**
+ * @Author LBX
+ * @Date 2021/5/10 19:55
+ * @Description  innitialzer
+ */
+public class TestServerInnitializer extends ChannelInitializer<SocketChannel> {
+
+    @Override
+    protected void initChannel(SocketChannel ch) throws Exception {
+        ChannelPipeline pipeline = ch.pipeline();
+
+        pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0 ,4, 0, 4));
+        pipeline.addLast(new LengthFieldPrepender(4));
+        pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
+        pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
+        pipeline.addLast(new TestServerHandler());//自定义handler
+
+    }
+}
+
+```
+
+
+- 客户端代码实现
+
+```java
+
+/**
+ * @Author LBX
+ * @Date 2021/5/10 20:34
+ * @Description
+ */
+public class TestClient {
+    public static void main(String[] args) throws Exception {
+        EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class).handler(new TestClientInnitializer());
+
+            ChannelFuture channelFuture = bootstrap.connect("localhost", 8001).sync();
+            channelFuture.channel().closeFuture().sync();
+
+        }finally {
+            eventLoopGroup.shutdownGracefully();
+        }
+
+    }
+
+
+
+}
+
+```
+
+
+```java
+/**
+ * @Author LBX
+ * @Date 2021/5/10 20:48
+ * @Description
+ */
+public class TestClientHandler extends SimpleChannelInboundHandler<String > {
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        System.out.println(ctx.channel().remoteAddress() + "来自服务端的数据：" + msg);
+        ctx.writeAndFlush("发给服务端的数据：" + System.currentTimeMillis());
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+}
+
+```
+
+
+```java
+/**
+ * @Author LBX
+ * @Date 2021/5/10 20:41
+ * @Description
+ */
+public class TestClientInnitializer extends ChannelInitializer<SocketChannel> {
+
+    @Override
+    protected void initChannel(SocketChannel ch) throws Exception {
+        ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+        pipeline.addLast(new LengthFieldPrepender(4));
+        pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
+        pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
+        pipeline.addLast(new TestClientHandler());
+
+
+    }
+}
+
+```
+
+- 问题总结
+
+```
+   <1> 在TestServer和TestClient中childHandler与handler方法之间的区别
+        
+        (1) 在服务端中可以使用handler也能使用childHandler，在客户端中只能使用handler方法
+
+        (2) 而在服务器中，如果使用的是handler方法的话，那么是针对bossGroup起作用，而childHandler则是针对workGroup起作用
+
+```
 
 

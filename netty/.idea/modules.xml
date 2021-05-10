@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/Socket/Socket.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/Socket/Socket.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/demo-all.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/demo-all.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/design/design.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/design/design.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/mybatis/mybatis.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/mybatis/mybatis.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/netty.iml" filepath="$PROJECT_DIR$/.idea/modules/netty.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/netty.main.iml" filepath="$PROJECT_DIR$/.idea/modules/netty.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/netty.test.iml" filepath="$PROJECT_DIR$/.idea/modules/netty.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/socket/socket.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/socket/socket.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../MyJavaProject/demo-all/springboot/springboot.iml" filepath="$PROJECT_DIR$/../../../MyJavaProject/demo-all/springboot/springboot.iml" />
     </modules>
   </component>
 </project>
